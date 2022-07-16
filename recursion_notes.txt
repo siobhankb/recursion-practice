@@ -1,0 +1,97 @@
+*** cool tool to call functions in command line ***
+$ ipython -i <filename>.py
+
+Recursive Function = 
+    a function that is defined in terms of ITSELF 
+    via a SELF-REFERENTIAL expression
+    continues to call itself until a condition is met
+    *must have 2 parts:
+        'recursive case' : decompose original problem into SMALLER, SIMPLER 
+                            instances of the same problem
+        'base case'      : smallest instance of the same problem
+
+recursion can help break down problems into smaller "sub-pieces," meaning that sub-piece involves the same process/algorithm as the main function
+
+EX: instead of iterating over a list to repeat a function
+dishes = ['breakfast', 'lunch', 'snacks', 'dinner', 'bedtime tea']
+
+def wash_dishes_iteratively(dishes):
+    for dish in dishes:
+        print('I washed dishes from ', dish)
+
+EX: now do it with recursion:
+1. appoint a head dishwasher and put them in charge of assigning dish duty to helpers
+2. assign titles and responsibilities to helpers based on the number of meals they must wash dishes for:
+    a) more than 1 meal: they get to be head dishwasher and can appoint helpers to divide their work
+    b) 1 meal: they are a helper and just get to wash
+
+**ends up making a TREE 
+
+basic example: factorial.py
+dish example: dishes.py
+
+
+Maintaining State
+* each recursive call has its own execution context
+* need to consider how to maintain 'state' during recursion
+-thread state through recursive calls & pass 'state' as argument (factorial & dishes: passed an argument to the recursive call that was a value from the current call)
+-keep state in global scope
+
+basic example: sum_to_num.py
+adv example: fibonacci.py
+
+
+Optimize to avoid unnecessary repetition:
+** use CACHE
+- save a value to CACHE
+- before making new calculation, check to see if it's already in CACHE
+** builtin for cache:
+    from functools import lru_cache
+
+** if you don't clear the cache, it keeps values from previous function calls!
+EX: fibonacci_optimized(5) ==> stores values from 5, 4, 3, 2, 1
+In [1]: fibonacci_optimized(5)
+fibonacci_optimized called with n=  5
+fibonacci_optimized called with n=  4
+fibonacci_optimized called with n=  3
+fibonacci_optimized called with n=  2
+fibonacci_optimized called with n=  1
+fibonacci_optimized called with n=  0
+Out[1]: 5
+
+
+so..fibonacci_optimized(7) ==> ONLY calculates 7 & 6 new!
+In [2]: fibonacci_optimized(7)
+fibonacci_optimized called with n=  7
+fibonacci_optimized called with n=  6
+Out[2]: 13
+
+
+Important Details:
+* Python has default call stack depth - can cause stack overflow if you're not careful
+    how to find out?
+        >>> import sys
+        >>> sys.getrecursionlimit()
+        3000
+
+* Python slicing will create NEW COPIES of a list
+    better to use INDEXING instead when recursing over lists
+
+    naive example:
+    def sum_list(lst):
+        if lst == []:
+            return 0
+        else:
+            return lst[0] + sum_list(lst[1:])
+
+    pythonic example:
+    def sum_list(lst):
+        # create a 'higher order' function inside the main function
+        def helper(start_index):
+            if start_index == len(lst):
+                return 0
+            else:
+                return lst[start_index] + helper(start_index + 1)
+        return helper(0)
+
+example: slice_vs_index.py
